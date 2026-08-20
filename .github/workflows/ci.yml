@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # No "engines" field in package.json, so pin to Node 20 LTS.
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          # lib/shopify.ts throws if these are unset. Dummy values only get
+          # the build past that check — no real Shopify API calls succeed
+          # against them, so this does not validate Storefront API access.
+          SHOPIFY_STORE_DOMAIN: "ci-placeholder.myshopify.com"
+          SHOPIFY_STOREFRONT_TOKEN: "ci-placeholder-token"
