@@ -17,3 +17,16 @@ test("first tenant's page loads successfully", async ({ page }) => {
   );
   await expect(page.locator("header")).toContainText(tenant.name);
 });
+
+// app/page.tsx is intentionally minimal and must not list or link to any
+// tenant (isolation requirement) — assert the root renders nothing else.
+test("root path renders only the platform placeholder, no tenant content", async ({
+  page,
+}) => {
+  const response = await page.goto("/");
+
+  expect(response?.status()).toBe(200);
+  await expect(page.locator("body")).toHaveText(
+    "MultifrontMulti-tenant storefronts, one platform."
+  );
+});
