@@ -28,8 +28,8 @@ export type TenantConfig = {
  * query an arbitrary tag.
  */
 const tenants = {
-  acme: {
-    name: "Acme Co",
+  alpha: {
+    name: "alpha",
     tag: "team:alpha",
     theme: {
       primary: "#1d4ed8",
@@ -39,8 +39,8 @@ const tenants = {
       surface: "#ffffff",
     },
   },
-  nova: {
-    name: "Nova Supply",
+  beta: {
+    name: "beta",
     tag: "team:beta",
     theme: {
       primary: "#b91c1c",
@@ -50,8 +50,8 @@ const tenants = {
       surface: "#ffffff",
     },
   },
-  loop: {
-    name: "Loop Merch",
+  omega: {
+    name: "omega",
     tag: "team:omega",
     theme: {
       primary: "#0f766e",

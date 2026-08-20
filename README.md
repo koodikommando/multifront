@@ -1,6 +1,6 @@
 # Multifront
 
-A multi-tenant Shopify storefront engine built with Next.js. A single deployment serves several independently themed storefronts (e.g. `/acme`, `/nova`, `/loop`) from one shared Shopify store, each showing only the products tagged for that tenant, with fully separated carts and no cross-tenant enumeration or linking. The platform is category-agnostic — a tenant can be a sports club's team shop, a band's merch drop, an event pop-up, or any other storefront that needs its own catalog slice and branding without its own deployment.
+A multi-tenant Shopify storefront engine built with Next.js. A single deployment serves several independently themed storefronts (e.g. `/alpha`, `/beta`, `/omega`) from one shared Shopify store, each showing only the products tagged for that tenant, with fully separated carts and no cross-tenant enumeration or linking. The platform is category-agnostic — a tenant can be a sports club's team shop, a band's merch drop, an event pop-up, or any other storefront that needs its own catalog slice and branding without its own deployment.
 
 ## Tech stack
 
@@ -82,7 +82,7 @@ cp .env.example .env.local   # then fill in the values below
 npm run dev                  # starts Next.js with Turbopack on http://localhost:3000
 ```
 
-Visit a configured tenant storefront directly, e.g. `http://localhost:3000/acme`, `/nova`, or `/loop` (see `lib/tenants.ts` for the current list). The root `/` intentionally does not link to any of them.
+Visit a configured tenant storefront directly, e.g. `http://localhost:3000/alpha`, `/beta`, or `/omega` (see `lib/tenants.ts` for the current list). The root `/` intentionally does not link to any of them.
 
 Other scripts:
 
