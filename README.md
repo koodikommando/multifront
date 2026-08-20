@@ -114,7 +114,7 @@ Add an entry to the `tenants` object in `lib/tenants.ts` (name, Shopify tag, the
 
 ## Testing
 
-Unit and integration tests run on [Vitest](https://vitest.dev), configured in `vitest.config.mts`. Tests are colocated with the code they cover (`*.test.ts` next to the source file), not in a separate `/tests` tree:
+Unit and integration tests run on [Vitest](https://vitest.dev), configured in `vitest.config.mts`. Tests are colocated with the code they cover (`*.test.ts` next to the source file), not in the `/tests` tree — that tree holds only the Vitest support stub and the Playwright e2e suite (below):
 
 - `lib/tenants.test.ts` — the tenant registry: `getTenant`/`getTenantSlugs` for known and unknown slugs, and that every registered tenant has the required fields.
 - `lib/cart-actions.test.ts` — the cart isolation logic (the priority target, since it's the core of the app's per-tenant guarantees). Mocks `next/headers`'s `cookies()` and `lib/shopify.ts`'s cart functions to test, without a live Next server or Shopify store: unknown-slug rejection before any cookie/Shopify access, `cart_{slug}`/`Path=/{slug}` cookie scoping, that one tenant's action never reads or writes another tenant's cookie, and that each action calls the correct underlying Shopify client function.
@@ -122,12 +122,22 @@ Unit and integration tests run on [Vitest](https://vitest.dev), configured in `v
 - `app/[tenant]/page.test.ts` — `generateStaticParams` returns exactly the tenant registry's slugs; a known slug fetches products with the right tag and renders `ProductGrid` (or the empty state); an unknown slug triggers `notFound()` *before* any product data is fetched.
 - `app/[tenant]/layout.test.ts` — `generateMetadata` sets `noindex`/`nofollow` and the tenant name for a known slug, `{}` for an unknown one; `TenantLayout` applies the right tenant's theme and threads `children` through; an unknown slug triggers `notFound()` before any tenant chrome renders.
 
-`lib/shopify.ts` imports the `server-only` package, which throws unconditionally outside Next's webpack/turbopack bundler (it relies on the bundler to alias it to a no-op on the server side). Since Vitest runs this code directly in Node, `vitest.config.mts` aliases `server-only` to `test/server-only-shim.ts`, an empty stub, so importing server-only code under test doesn't throw. The route tests also need `oxc: { jsx: "automatic" }` in `vitest.config.mts` to import `.tsx` files directly, since `tsconfig.json` sets `"jsx": "preserve"` for Next's own compiler — Vite's default transformer (`oxc`) needs its own JSX setting instead. The page/layout tests call the async Server Components directly and assert on the returned React element tree (`.type`/`.props`), so no DOM renderer or jsdom is needed.
+`lib/shopify.ts` imports the `server-only` package, which throws unconditionally outside Next's webpack/turbopack bundler (it relies on the bundler to alias it to a no-op on the server side). Since Vitest runs this code directly in Node, `vitest.config.mts` aliases `server-only` to `tests/server-only-shim.ts`, an empty stub, so importing server-only code under test doesn't throw. The route tests also need `oxc: { jsx: "automatic" }` in `vitest.config.mts` to import `.tsx` files directly, since `tsconfig.json` sets `"jsx": "preserve"` for Next's own compiler — Vite's default transformer (`oxc`) needs its own JSX setting instead. The page/layout tests call the async Server Components directly and assert on the returned React element tree (`.type`/`.props`), so no DOM renderer or jsdom is needed.
 
-Not yet covered: React components (`cart-provider.tsx`, `cart-drawer.tsx`, etc.) have no tests yet, and there is no e2e suite (e.g. Playwright) — both are deferred to a later pass.
+Not yet covered: React components (`cart-provider.tsx`, `cart-drawer.tsx`, etc.) have no tests yet — deferred to a later pass.
 
 ```bash
 npm run test   # runs the full Vitest suite once (not watch mode)
+```
+
+### End-to-end tests
+
+`tests/e2e/smoke.spec.ts` runs on [Playwright](https://playwright.dev), configured in `playwright.config.ts`. It's deliberately minimal for now: it visits the first tenant from `lib/tenants.ts` (currently `alpha`) and asserts the page returns `200` and renders that tenant's name — proving the Playwright setup itself works (browser launch, dev server boot, real page render) before cart/cross-tenant-isolation scenarios are layered on top in a follow-up.
+
+The suite drives Playwright's `webServer` against `next dev` on a dedicated port (3100, not 3000) rather than a production build — `next dev` boots faster and doesn't force-prerender every tenant at startup the way `next build` does. That said, visiting a tenant page still makes a real, per-request Storefront API call either way (there's no mocking), so `SHOPIFY_STORE_DOMAIN`/`SHOPIFY_STOREFRONT_TOKEN` must point at a real store for this suite to pass, locally and in CI — placeholder values fail the request outright rather than degrading gracefully.
+
+```bash
+npm run test:e2e   # runs the Playwright suite once (add --ui for the interactive runner)
 ```
 
 ## Continuous integration
@@ -135,6 +145,8 @@ npm run test   # runs the full Vitest suite once (not watch mode)
 `.github/workflows/ci.yml` runs on every push to `main` and every pull request targeting `main`, as four separate steps (each reporting its own pass/fail status): **Lint** (`npm run lint`), **Type check** (`npx tsc --noEmit`), **Test** (`npm run test`), then **Build** (`npm run build`). Any failing step fails the whole workflow.
 
 Both the Test and Build steps need `SHOPIFY_STORE_DOMAIN`/`SHOPIFY_STOREFRONT_TOKEN` set — Build for real, since `app/[tenant]/page.tsx` statically prerenders every tenant page at build time via real Storefront API calls (`generateStaticParams` + `dynamicParams = false`); Test only to satisfy `lib/shopify.ts`'s env-var guard, since the test suite mocks or stubs every actual Shopify call. Both steps read these from GitHub repo secrets of the same names, not hardcoded values, so the connected store's live credentials never appear in the workflow file.
+
+`.github/workflows/e2e.yml` runs only on pull requests targeting `main` (not every push, since browser tests are slower). It installs the Playwright chromium browser and runs `npm run test:e2e` with the same real `SHOPIFY_STORE_DOMAIN`/`SHOPIFY_STOREFRONT_TOKEN` secrets as the build step — real, not placeholder, for the same reason: the smoke test's assertions depend on an actual rendered page. On any non-cancelled run it uploads the HTML report as a build artifact for debugging failures.
 
 ## Deployment
 

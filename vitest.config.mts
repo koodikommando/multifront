@@ -14,9 +14,9 @@ export default defineConfig({
     // same way app code does.
     tsconfigPaths: true,
     alias: {
-      // See test/server-only-shim.ts for why this is needed.
+      // See tests/server-only-shim.ts for why this is needed.
       "server-only": fileURLToPath(
-        new URL("./test/server-only-shim.ts", import.meta.url)
+        new URL("./tests/server-only-shim.ts", import.meta.url)
       ),
     },
   },
