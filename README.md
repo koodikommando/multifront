@@ -9,6 +9,8 @@ A multi-tenant Shopify storefront engine built with Next.js. A single deployment
 - **Commerce backend:** Shopify Storefront API (GraphQL, private app token), consumed server-side only
 - **State/data:** No client-side data store — cart state lives in React context, hydrated via Next.js Server Actions; product data is fetched server-side with ISR
 - **Linting:** ESLint (`next/core-web-vitals`, `next/typescript`)
+- **Testing:** [Vitest](https://vitest.dev) for unit/integration tests
+- **CI:** GitHub Actions (`.github/workflows/ci.yml`)
 
 ## Architecture
 
@@ -90,6 +92,7 @@ Other scripts:
 npm run build   # production build (Turbopack)
 npm run start   # run the production build
 npm run lint    # ESLint
+npm run test    # Vitest (unit + integration)
 ```
 
 ## Environment variables
@@ -108,6 +111,28 @@ Products are assigned to a tenant by tagging them in Shopify with that tenant's 
 ## Adding a new tenant
 
 Add an entry to the `tenants` object in `lib/tenants.ts` (name, Shopify tag, theme colors) and tag the corresponding products in Shopify — that's the entire integration surface. No other code changes are required; the new route is picked up automatically via `generateStaticParams`. A tenant can represent any merchandise vertical (a sports team, a band, an event, a corporate store) — the platform doesn't assume a product category.
+
+## Testing
+
+Unit and integration tests run on [Vitest](https://vitest.dev), configured in `vitest.config.mts`. Tests are colocated with the code they cover (`*.test.ts` next to the source file), not in a separate `/tests` tree:
+
+- `lib/tenants.test.ts` — the tenant registry: `getTenant`/`getTenantSlugs` for known and unknown slugs, and that every registered tenant has the required fields.
+- `lib/cart-actions.test.ts` — the cart isolation logic (the priority target, since it's the core of the app's per-tenant guarantees). Mocks `next/headers`'s `cookies()` and `lib/shopify.ts`'s cart functions to test, without a live Next server or Shopify store: unknown-slug rejection before any cookie/Shopify access, `cart_{slug}`/`Path=/{slug}` cookie scoping, that one tenant's action never reads or writes another tenant's cookie, and that each action calls the correct underlying Shopify client function.
+- `lib/shopify.test.ts` — the Storefront API client. Stubs global `fetch` to test `shopifyFetch`'s error handling (missing env vars, non-OK responses, GraphQL `errors[]`, missing `data`), the ISR vs. `cache: "no-store"` request-shape split, and the cart-mutation payload unwrapping (`userErrors`, null-cart) without hitting real Shopify.
+
+`lib/shopify.ts` imports the `server-only` package, which throws unconditionally outside Next's webpack/turbopack bundler (it relies on the bundler to alias it to a no-op on the server side). Since Vitest runs this code directly in Node, `vitest.config.mts` aliases `server-only` to `test/server-only-shim.ts`, an empty stub, so importing server-only code under test doesn't throw.
+
+Not yet covered: React components (`cart-provider.tsx`, `cart-drawer.tsx`, etc.) and route files (`app/[tenant]/layout.tsx`/`page.tsx`) have no tests yet, and there is no e2e suite (e.g. Playwright) — both are deferred to a later pass.
+
+```bash
+npm run test   # runs the full Vitest suite once (not watch mode)
+```
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request targeting `main`, as four separate steps (each reporting its own pass/fail status): **Lint** (`npm run lint`), **Type check** (`npx tsc --noEmit`), **Test** (`npm run test`), then **Build** (`npm run build`). Any failing step fails the whole workflow.
+
+Both the Test and Build steps need `SHOPIFY_STORE_DOMAIN`/`SHOPIFY_STOREFRONT_TOKEN` set — Build for real, since `app/[tenant]/page.tsx` statically prerenders every tenant page at build time via real Storefront API calls (`generateStaticParams` + `dynamicParams = false`); Test only to satisfy `lib/shopify.ts`'s env-var guard, since the test suite mocks or stubs every actual Shopify call. Both steps read these from GitHub repo secrets of the same names, not hardcoded values, so the connected store's live credentials never appear in the workflow file.
 
 ## Deployment
 
