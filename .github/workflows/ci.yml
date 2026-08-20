@@ -32,8 +32,9 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # lib/shopify.ts throws if these are unset. Dummy values only get
-          # the build past that check — no real Shopify API calls succeed
-          # against them, so this does not validate Storefront API access.
-          SHOPIFY_STORE_DOMAIN: "ci-placeholder.myshopify.com"
-          SHOPIFY_STOREFRONT_TOKEN: "ci-placeholder-token"
+          # app/[tenant]/page.tsx statically prerenders every tenant at
+          # build time (generateStaticParams + dynamicParams = false), and
+          # each prerender calls the real Storefront API — so these must be
+          # working credentials, not placeholders, or the build fails.
+          SHOPIFY_STORE_DOMAIN: ${{ secrets.SHOPIFY_STORE_DOMAIN }}
+          SHOPIFY_STOREFRONT_TOKEN: ${{ secrets.SHOPIFY_STOREFRONT_TOKEN }}
