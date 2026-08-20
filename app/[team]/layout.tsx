@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { CSSProperties, ReactNode } from "react";
 import { getTeam } from "@/lib/teams";
+import CartProvider from "@/components/cart-provider";
+import CartDrawer from "@/components/cart-drawer";
 
 type TeamParams = Promise<{ team: string }>;
 
@@ -43,13 +45,18 @@ export default async function TeamLayout({
       style={themeVars}
       className="min-h-screen bg-(--team-background) text-(--team-foreground)"
     >
-      <header className="bg-(--team-primary) px-6 py-4">
-        <p className="mx-auto max-w-6xl text-xl font-bold tracking-tight text-(--team-surface)">
-          <span className="mr-2 inline-block h-3 w-3 rounded-full bg-(--team-accent)" />
-          {config.name}
-        </p>
-      </header>
-      <main className="mx-auto max-w-6xl px-6 py-10">{children}</main>
+      <CartProvider teamSlug={team}>
+        <header className="bg-(--team-primary) px-6 py-4">
+          <div className="mx-auto flex max-w-6xl items-center justify-between">
+            <p className="text-xl font-bold tracking-tight text-(--team-surface)">
+              <span className="mr-2 inline-block h-3 w-3 rounded-full bg-(--team-accent)" />
+              {config.name}
+            </p>
+            <CartDrawer />
+          </div>
+        </header>
+        <main className="mx-auto max-w-6xl px-6 py-10">{children}</main>
+      </CartProvider>
     </div>
   );
 }
