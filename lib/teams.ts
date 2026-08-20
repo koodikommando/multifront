@@ -50,6 +50,17 @@ const teams = {
       surface: "#ffffff",
     },
   },
+  omega: {
+    name: "Team omega",
+    tag: "team:omega",
+    theme: {
+      primary: "#0f766e",
+      accent: "#34d399",
+      background: "#f0fdfa",
+      foreground: "#134e4a",
+      surface: "#ffffff",
+    },
+  },
 } as const satisfies Record<string, TeamConfig>;
 
 export type TeamSlug = keyof typeof teams;
