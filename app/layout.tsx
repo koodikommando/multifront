@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Urheilukauppa",
-  description: "Official team merchandise.",
+  title: "Multifront",
+  description: "Multi-tenant storefronts, one platform.",
 };
 
 export default function RootLayout({
