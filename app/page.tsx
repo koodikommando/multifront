@@ -1,4 +1,4 @@
-// Intentionally minimal: the root page must not list or link to any team
+// Intentionally minimal: the root page must not list or link to any tenant
 // storefront (isolation requirement).
 export default function Home() {
   return (

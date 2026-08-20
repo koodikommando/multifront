@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { getTeam } from "@/lib/teams";
+import { getTenant } from "@/lib/tenants";
 import {
   addToCart,
   createCart,
@@ -17,18 +17,18 @@ const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 10;
 
 /**
  * Cart isolation happens here. Every action:
- * 1. validates the team slug against lib/teams.ts (unknown slug -> throw),
+ * 1. validates the tenant slug against lib/tenants.ts (unknown slug -> throw),
  * 2. derives the cookie name `cart_${slug}` from that validated slug —
  *    never from anything else the client sent,
  * 3. scopes the cookie to Path=/{slug}, so the browser only presents it on
- *    that team's routes.
+ *    that tenant's routes.
  * The cart ID itself never passes through the client (httpOnly).
  */
-function assertTeamSlug(teamSlug: string): string {
-  if (!getTeam(teamSlug)) {
-    throw new Error("Unknown team");
+function assertTenantSlug(tenantSlug: string): string {
+  if (!getTenant(tenantSlug)) {
+    throw new Error("Unknown tenant");
   }
-  return teamSlug;
+  return tenantSlug;
 }
 
 function cartCookieName(slug: string): string {
@@ -46,9 +46,9 @@ function cartCookieOptions(slug: string) {
 }
 
 export async function getCartAction(
-  teamSlug: string
+  tenantSlug: string
 ): Promise<ShopifyCart | null> {
-  const slug = assertTeamSlug(teamSlug);
+  const slug = assertTenantSlug(tenantSlug);
   const cookieStore = await cookies();
   const cartId = cookieStore.get(cartCookieName(slug))?.value;
   if (!cartId) return null;
@@ -56,10 +56,10 @@ export async function getCartAction(
 }
 
 export async function addToCartAction(
-  teamSlug: string,
+  tenantSlug: string,
   merchandiseId: string
 ): Promise<ShopifyCart> {
-  const slug = assertTeamSlug(teamSlug);
+  const slug = assertTenantSlug(tenantSlug);
   const cookieStore = await cookies();
   const cartId = cookieStore.get(cartCookieName(slug))?.value;
   const lines = [{ merchandiseId, quantity: 1 }];
@@ -85,11 +85,11 @@ export async function addToCartAction(
 }
 
 export async function updateLineAction(
-  teamSlug: string,
+  tenantSlug: string,
   lineId: string,
   quantity: number
 ): Promise<ShopifyCart | null> {
-  const slug = assertTeamSlug(teamSlug);
+  const slug = assertTenantSlug(tenantSlug);
   const cookieStore = await cookies();
   const cartId = cookieStore.get(cartCookieName(slug))?.value;
   if (!cartId) return null;
@@ -101,10 +101,10 @@ export async function updateLineAction(
 }
 
 export async function removeLineAction(
-  teamSlug: string,
+  tenantSlug: string,
   lineId: string
 ): Promise<ShopifyCart | null> {
-  const slug = assertTeamSlug(teamSlug);
+  const slug = assertTenantSlug(tenantSlug);
   const cookieStore = await cookies();
   const cartId = cookieStore.get(cartCookieName(slug))?.value;
   if (!cartId) return null;

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getTeam, getTeamSlugs } from "@/lib/teams";
+import { getTenant, getTenantSlugs } from "@/lib/tenants";
 import { getProductsByTag } from "@/lib/shopify";
 import ProductGrid from "@/components/product-grid";
 
@@ -9,16 +9,16 @@ export const dynamicParams = false;
 export const revalidate = 300;
 
 export function generateStaticParams() {
-  return getTeamSlugs().map((team) => ({ team }));
+  return getTenantSlugs().map((tenant) => ({ tenant }));
 }
 
-export default async function TeamPage({
+export default async function TenantPage({
   params,
 }: {
-  params: Promise<{ team: string }>;
+  params: Promise<{ tenant: string }>;
 }) {
-  const { team } = await params;
-  const config = getTeam(team);
+  const { tenant } = await params;
+  const config = getTenant(tenant);
   if (!config) notFound();
 
   const products = await getProductsByTag(config.tag);
@@ -26,7 +26,7 @@ export default async function TeamPage({
   return (
     <div>
       <h1 className="mb-8 text-3xl font-bold tracking-tight">
-        Shop <span className="text-(--team-primary)">{config.name}</span>
+        Shop <span className="text-(--tenant-primary)">{config.name}</span>
       </h1>
       {products.length === 0 ? (
         <p className="opacity-70">No products available yet. Check back soon.</p>

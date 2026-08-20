@@ -95,8 +95,8 @@ export type ShopifyProduct = {
   };
 };
 
-const TEAM_PRODUCTS_QUERY = /* GraphQL */ `
-  query TeamProducts($query: String!, $first: Int!) {
+const TENANT_PRODUCTS_QUERY = /* GraphQL */ `
+  query TenantProducts($query: String!, $first: Int!) {
     products(first: $first, query: $query, sortKey: TITLE) {
       nodes {
         id
@@ -130,7 +130,7 @@ export async function getProductsByTag(
   first = 24
 ): Promise<ShopifyProduct[]> {
   const data = await shopifyFetch<{ products: { nodes: ShopifyProduct[] } }>({
-    query: TEAM_PRODUCTS_QUERY,
+    query: TENANT_PRODUCTS_QUERY,
     variables: { query: `tag:'${tag}'`, first },
   });
   return data.products.nodes;

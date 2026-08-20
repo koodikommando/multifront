@@ -24,12 +24,12 @@ export default function CartDrawer() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="relative rounded-full bg-(--team-surface) px-4 py-2 text-sm font-semibold text-(--team-primary)"
+        className="relative rounded-full bg-(--tenant-surface) px-4 py-2 text-sm font-semibold text-(--tenant-primary)"
         aria-label={`Open cart, ${count} items`}
       >
         Cart
         {count > 0 && (
-          <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-(--team-accent) px-1 text-xs font-bold text-(--team-foreground)">
+          <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-(--tenant-accent) px-1 text-xs font-bold text-(--tenant-foreground)">
             {count}
           </span>
         )}
@@ -43,7 +43,7 @@ export default function CartDrawer() {
             onClick={() => setOpen(false)}
             className="absolute inset-0 bg-black/40"
           />
-          <div className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-(--team-surface) text-(--team-foreground) shadow-xl">
+          <div className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-(--tenant-surface) text-(--tenant-foreground) shadow-xl">
             <div className="flex items-center justify-between border-b border-black/10 px-6 py-4">
               <h2 className="text-lg font-bold">Your cart</h2>
               <button
@@ -140,12 +140,12 @@ export default function CartDrawer() {
               {cart && lines.length > 0 ? (
                 <a
                   href={cart.checkoutUrl}
-                  className="block w-full rounded-lg bg-(--team-primary) px-4 py-3 text-center font-semibold text-(--team-surface)"
+                  className="block w-full rounded-lg bg-(--tenant-primary) px-4 py-3 text-center font-semibold text-(--tenant-surface)"
                 >
                   Checkout
                 </a>
               ) : (
-                <span className="block w-full cursor-not-allowed rounded-lg bg-(--team-primary) px-4 py-3 text-center font-semibold text-(--team-surface) opacity-40">
+                <span className="block w-full cursor-not-allowed rounded-lg bg-(--tenant-primary) px-4 py-3 text-center font-semibold text-(--tenant-surface) opacity-40">
                   Checkout
                 </span>
               )}

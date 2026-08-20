@@ -1,4 +1,4 @@
-export type TeamTheme = {
+export type TenantTheme = {
   /** Main brand color: header, buttons, price highlights. */
   primary: string;
   /** Secondary highlight color: badges, hover states. */
@@ -11,25 +11,25 @@ export type TeamTheme = {
   surface: string;
 };
 
-export type TeamConfig = {
+export type TenantConfig = {
   /** Display name shown in the header and page title. */
   name: string;
-  /** Shopify product tag for this team. The only place a tag may come from. */
+  /** Shopify product tag for this tenant. The only place a tag may come from. */
   tag: string;
-  theme: TeamTheme;
+  theme: TenantTheme;
 };
 
 /**
  * Single source of truth for which storefronts exist.
- * Adding a team = adding an entry here (and tagging products in Shopify).
+ * Adding a tenant = adding an entry here (and tagging products in Shopify).
  *
  * Isolation: the Shopify tag used in product queries is always read from
  * this object, never derived from the URL, so an arbitrary slug can never
  * query an arbitrary tag.
  */
-const teams = {
-  alpha: {
-    name: "Team Alpha",
+const tenants = {
+  acme: {
+    name: "Acme Co",
     tag: "team:alpha",
     theme: {
       primary: "#1d4ed8",
@@ -39,8 +39,8 @@ const teams = {
       surface: "#ffffff",
     },
   },
-  beta: {
-    name: "Team Beta",
+  nova: {
+    name: "Nova Supply",
     tag: "team:beta",
     theme: {
       primary: "#b91c1c",
@@ -50,8 +50,8 @@ const teams = {
       surface: "#ffffff",
     },
   },
-  omega: {
-    name: "Team omega",
+  loop: {
+    name: "Loop Merch",
     tag: "team:omega",
     theme: {
       primary: "#0f766e",
@@ -61,17 +61,17 @@ const teams = {
       surface: "#ffffff",
     },
   },
-} as const satisfies Record<string, TeamConfig>;
+} as const satisfies Record<string, TenantConfig>;
 
-export type TeamSlug = keyof typeof teams;
+export type TenantSlug = keyof typeof tenants;
 
-export function getTeam(slug: string): TeamConfig | null {
-  if (Object.prototype.hasOwnProperty.call(teams, slug)) {
-    return teams[slug as TeamSlug];
+export function getTenant(slug: string): TenantConfig | null {
+  if (Object.prototype.hasOwnProperty.call(tenants, slug)) {
+    return tenants[slug as TenantSlug];
   }
   return null;
 }
 
-export function getTeamSlugs(): TeamSlug[] {
-  return Object.keys(teams) as TeamSlug[];
+export function getTenantSlugs(): TenantSlug[] {
+  return Object.keys(tenants) as TenantSlug[];
 }

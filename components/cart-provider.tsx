@@ -35,20 +35,20 @@ export function useCart(): CartContextValue {
 }
 
 export default function CartProvider({
-  teamSlug,
+  tenantSlug,
   children,
 }: {
-  teamSlug: string;
+  tenantSlug: string;
   children: ReactNode;
 }) {
   const [cart, setCart] = useState<ShopifyCart | null>(null);
   const [pending, startTransition] = useTransition();
 
-  // Team pages are static (ISR), so the per-user cart hydrates client-side
+  // Tenant pages are static (ISR), so the per-user cart hydrates client-side
   // via a Server Action instead of forcing the route dynamic with cookies().
   useEffect(() => {
     let cancelled = false;
-    getCartAction(teamSlug)
+    getCartAction(tenantSlug)
       .then((result) => {
         if (!cancelled) setCart(result);
       })
@@ -58,12 +58,12 @@ export default function CartProvider({
     return () => {
       cancelled = true;
     };
-  }, [teamSlug]);
+  }, [tenantSlug]);
 
   const addLine = (merchandiseId: string) => {
     startTransition(async () => {
       try {
-        setCart(await addToCartAction(teamSlug, merchandiseId));
+        setCart(await addToCartAction(tenantSlug, merchandiseId));
       } catch (error) {
         console.error("Failed to add to cart", error);
       }
@@ -73,7 +73,7 @@ export default function CartProvider({
   const updateLine = (lineId: string, quantity: number) => {
     startTransition(async () => {
       try {
-        setCart(await updateLineAction(teamSlug, lineId, quantity));
+        setCart(await updateLineAction(tenantSlug, lineId, quantity));
       } catch (error) {
         console.error("Failed to update cart", error);
       }
@@ -83,7 +83,7 @@ export default function CartProvider({
   const removeLine = (lineId: string) => {
     startTransition(async () => {
       try {
-        setCart(await removeLineAction(teamSlug, lineId));
+        setCart(await removeLineAction(tenantSlug, lineId));
       } catch (error) {
         console.error("Failed to remove from cart", error);
       }

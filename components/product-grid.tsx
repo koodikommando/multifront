@@ -19,7 +19,7 @@ export default function ProductGrid({
       {products.map((product) => (
         <li
           key={product.id}
-          className="overflow-hidden rounded-xl border border-black/10 bg-(--team-surface) shadow-sm transition-shadow hover:shadow-md"
+          className="overflow-hidden rounded-xl border border-black/10 bg-(--tenant-surface) shadow-sm transition-shadow hover:shadow-md"
         >
           <div className="relative aspect-square bg-black/5">
             {product.featuredImage ? (
@@ -41,7 +41,7 @@ export default function ProductGrid({
               <h2 className="text-sm font-medium leading-snug">
                 {product.title}
               </h2>
-              <p className="shrink-0 rounded-full bg-(--team-primary) px-3 py-1 text-sm font-semibold text-(--team-surface)">
+              <p className="shrink-0 rounded-full bg-(--tenant-primary) px-3 py-1 text-sm font-semibold text-(--tenant-surface)">
                 {formatPrice(
                   product.priceRange.minVariantPrice.amount,
                   product.priceRange.minVariantPrice.currencyCode
