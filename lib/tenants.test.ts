@@ -29,7 +29,7 @@ describe("getTenant", () => {
 
 describe("getTenantSlugs", () => {
   it("returns all registered slugs", () => {
-    expect(getTenantSlugs().sort()).toEqual(["alpha", "beta", "omega"]);
+    expect(getTenantSlugs().sort()).toEqual(["alpha", "beta", "gamma", "omega"]);
   });
 });
 

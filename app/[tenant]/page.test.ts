@@ -55,7 +55,12 @@ describe("generateStaticParams", () => {
   it("returns exactly the slugs in the tenant registry, no more, no less", () => {
     const params = generateStaticParams();
 
-    expect(params).toEqual([{ tenant: "alpha" }, { tenant: "beta" }, { tenant: "omega" }]);
+    expect(params).toEqual([
+      { tenant: "alpha" },
+      { tenant: "beta" },
+      { tenant: "omega" },
+      { tenant: "gamma" },
+    ]);
     expect(params.map((p) => p.tenant)).toEqual(getTenantSlugs());
   });
 });
