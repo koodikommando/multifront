@@ -91,6 +91,29 @@ test.describe("add-to-cart and cross-tenant cart isolation", () => {
       cookiesVisibleToTenantB.some((c) => c.name === `cart_${TENANT_WITH_STOCK_A}`)
     ).toBe(false);
   });
+
+  test("removing the only item in the cart empties it", async ({ page }) => {
+    const purchasableProduct = page
+      .getByRole("listitem")
+      .filter({ has: page.getByRole("button", { name: "Add to cart" }) })
+      .first();
+    const productTitle = await purchasableProduct
+      .getByRole("heading", { level: 2 })
+      .innerText();
+
+    await purchasableProduct.getByRole("button", { name: "Add to cart" }).click();
+    await page.getByRole("button", { name: /open cart/i }).click();
+    const drawer = page.getByRole("dialog", { name: "Cart" });
+    await expect(drawer.getByText(productTitle)).toBeVisible();
+
+    await drawer.getByRole("button", { name: "Remove" }).click();
+
+    await expect(drawer.getByText(productTitle)).not.toBeVisible();
+    await expect(drawer.getByText("Your cart is empty.")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Open cart, 0 items" })
+    ).toBeVisible();
+  });
 });
 
 test("omega: out-of-stock product is shown but cannot be added to cart", async ({
