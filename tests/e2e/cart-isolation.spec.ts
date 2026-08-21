@@ -114,6 +114,65 @@ test.describe("add-to-cart and cross-tenant cart isolation", () => {
       page.getByRole("button", { name: "Open cart, 0 items" })
     ).toBeVisible();
   });
+
+  test("the quantity stepper increases and decreases the line quantity", async ({
+    page,
+  }) => {
+    const purchasableProduct = page
+      .getByRole("listitem")
+      .filter({ has: page.getByRole("button", { name: "Add to cart" }) })
+      .first();
+
+    await purchasableProduct.getByRole("button", { name: "Add to cart" }).click();
+    await page.getByRole("button", { name: /open cart/i }).click();
+    const drawer = page.getByRole("dialog", { name: "Cart" });
+    const line = drawer.getByRole("listitem");
+    const increaseButton = line.getByRole("button", { name: "Increase quantity" });
+    const decreaseButton = line.getByRole("button", { name: "Decrease quantity" });
+
+    await expect(line.getByText("1", { exact: true })).toBeVisible();
+
+    await increaseButton.click();
+    await expect(line.getByText("2", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Open cart, 2 items" })
+    ).toBeVisible();
+
+    await decreaseButton.click();
+    await expect(line.getByText("1", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Open cart, 1 items" })
+    ).toBeVisible();
+  });
+
+  test("decreasing quantity below 1 removes the line, matching the Remove button", async ({
+    page,
+  }) => {
+    const purchasableProduct = page
+      .getByRole("listitem")
+      .filter({ has: page.getByRole("button", { name: "Add to cart" }) })
+      .first();
+    const productTitle = await purchasableProduct
+      .getByRole("heading", { level: 2 })
+      .innerText();
+
+    await purchasableProduct.getByRole("button", { name: "Add to cart" }).click();
+    await page.getByRole("button", { name: /open cart/i }).click();
+    const drawer = page.getByRole("dialog", { name: "Cart" });
+    await expect(drawer.getByText(productTitle)).toBeVisible();
+
+    // Line starts at quantity 1 (a fresh add-to-cart), so a single decrease
+    // takes it to 0 — components/cart-drawer.tsx calls updateLine(id, 0),
+    // and lib/cart-actions.ts's updateLineAction treats quantity <= 0 as a
+    // remove rather than an update.
+    await drawer.getByRole("button", { name: "Decrease quantity" }).click();
+
+    await expect(drawer.getByText(productTitle)).not.toBeVisible();
+    await expect(drawer.getByText("Your cart is empty.")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Open cart, 0 items" })
+    ).toBeVisible();
+  });
 });
 
 test("omega: out-of-stock product is shown but cannot be added to cart", async ({

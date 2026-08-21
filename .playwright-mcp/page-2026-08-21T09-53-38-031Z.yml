@@ -1,0 +1,58 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - paragraph [ref=e5]: alpha
+        - button "Open cart, 2 items" [ref=e71]:
+          - text: Cart
+          - generic [ref=e47]: "2"
+        - dialog "Cart" [ref=e48]:
+          - button "Close cart" [ref=e49]
+          - generic [ref=e50]:
+            - generic [ref=e51]:
+              - heading "Your cart" [level=2] [ref=e52]
+              - button "Close" [ref=e53]
+            - list [ref=e54]:
+              - listitem [ref=e55]:
+                - img "Alpha Circle" [ref=e57]
+                - generic [ref=e58]:
+                  - paragraph [ref=e59]: Alpha Circle
+                  - generic [ref=e60]:
+                    - button "Decrease quantity" [ref=e61]: −
+                    - generic [ref=e62]: "2"
+                    - button "Increase quantity" [ref=e63]: +
+                    - button "Remove" [ref=e64]
+                - paragraph [ref=e65]: $0.00
+            - generic [ref=e66]:
+              - generic [ref=e67]:
+                - generic [ref=e68]: Subtotal
+                - generic [ref=e69]: $0.00
+              - link "Checkout" [ref=e70] [cursor=pointer]:
+                - /url: https://urheilukauppa-tt8axqn2.myshopify.com/cart/c/hWNFuHVIVm3dM16544CvcsHj?key=w2-BsosIvXUuB2xHtMcLief7haQZ14x-IF364uoTVfyX_eiDcPFjITkShvkQ2A4BcUlJf7Ofe4clrVH3b8Z54b6ysV0HZKkRBxCFaKPptC-Rsyf9871xIi_2lJfPBbvF0Nx0DVss_FoRzkk6ezyqmo5jiFhk0XImaV5UIM-r3ldl3y5d592PxM5JOy1Q9azh&_s=bc38d813-dbdc-4f5a-9117-1ca727ac3266&_y=af9ee1c4-ccbf-47da-8272-547c2e247732
+    - main [ref=e8]:
+      - generic [ref=e9]:
+        - heading "Shop alpha" [level=1] [ref=e10]
+        - list [ref=e11]:
+          - listitem [ref=e12]:
+            - img "Alpha Circle" [ref=e14]
+            - generic [ref=e15]:
+              - generic [ref=e16]:
+                - heading "Alpha Circle" [level=2] [ref=e17]
+                - paragraph [ref=e18]: $0.00
+              - button "Add to cart" [ref=e19]
+          - listitem [ref=e20]:
+            - img "Alpha Square" [ref=e22]
+            - generic [ref=e23]:
+              - generic [ref=e24]:
+                - heading "Alpha Square" [level=2] [ref=e25]
+                - paragraph [ref=e26]: $0.00
+              - button "Add to cart" [ref=e27]
+          - listitem [ref=e28]:
+            - img "Alpha Triangle" [ref=e30]
+            - generic [ref=e31]:
+              - generic [ref=e32]:
+                - heading "Alpha Triangle" [level=2] [ref=e33]
+                - paragraph [ref=e34]: $0.00
+              - button "Add to cart" [ref=e35]
+  - button "Open Next.js Dev Tools" [ref=e42] [cursor=pointer]
+  - alert [ref=e36]
