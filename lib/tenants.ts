@@ -61,6 +61,17 @@ const tenants = {
       surface: "#ffffff",
     },
   },
+  gamma: {
+    name: "gamma",
+    tag: "team:gamma",
+    theme: {
+      primary: "#ea580c",
+      accent: "#fb923c",
+      background: "#fff7ed",
+      foreground: "#7c2d12",
+      surface: "#ffffff",
+    },
+  },
 } as const satisfies Record<string, TenantConfig>;
 
 export type TenantSlug = keyof typeof tenants;
